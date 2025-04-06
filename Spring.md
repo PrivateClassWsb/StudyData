@@ -1,3 +1,206 @@
+# 工厂设计模式
+
+## 1.什么是⼯⼚设计模式
+
+- 概念：通过⼯⼚类，创建对象。
+
+而不再：
+
+```java
+User user = new User();
+UserDAO userDAO = new UserDAOImpl();
+```
+
+- 好处：解耦合
+
+耦合：代码间的强关联关系，⼀⽅的改变会影响到另⼀⽅
+
+问题：不利于代码维护。把接⼝的实现类，硬编码在程序中。
+
+```java
+ UserService userService = new UserServiceImpl();
+```
+
+## 2.简单工厂的设计
+
+```java
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
+
+public class BeanFactory {
+    private static Properties env = new Properties();
+
+    static {
+        try {
+            // 第一步：获得IO输入流，读取 applicationContext.properties 文件
+            InputStream inputStream = BeanFactory.class.getResourceAsStream("/applicationContext.properties");
+
+            // 第二步：文件内容封装到 Properties 集合中
+            // key = userService, value = com.baizhiedu.basic.UserServiceImpl
+            env.load(inputStream);
+            inputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+	/*
+		对象的创建⽅式：
+			1. 直接调⽤构造⽅法 创建对象  UserService userService = new UserServiceImpl();
+ 			2. 通过反射的形式 创建对象 解耦合
+				Class clazz = Class.forName("com.baizhiedu.basic.UserServiceImpl");
+ 				UserService userService = (UserService)clazz.newInstance();
+ 	*/
+    public static UserService getUserService() {
+        UserService userService = null;
+        try {
+            // 从配置文件中读取类名
+            // 如果不写到配置文件中，那这里就要：Class.forName(com.baizhiedu.basic.UserServiceImpl); 还是耦合。
+            Class<?> clazz = Class.forName(env.getProperty("userService"));
+            userService = (UserService) clazz.newInstance();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+
+        return userService;
+    }
+
+    // 通过反射创建 UserDAO 对象
+    public static UserDAO getUserDAO() {
+        UserDAO userDAO = null;
+        try {
+            Class<?> clazz = Class.forName(env.getProperty("userDAO"));
+            userDAO = (UserDAO) clazz.newInstance();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+
+        return userDAO;
+    }
+}
+
+```
+
+## 3.通用工厂的设计
+
+- 问题：简单⼯⼚会存在⼤量的代码冗余
+
+![image-20250406183239909](https://wsb-typora-picture.oss-cn-chengdu.aliyuncs.com/picgo/202504061832009.png)
+
+- 通⽤⼯⼚的代码
+
+```java
+import java.io.InputStream;
+import java.util.Properties;
+
+public class BeanFactory {
+    private static Properties env = new Properties();
+
+    static {
+        try {
+            // 加载配置文件
+            InputStream inputStream = BeanFactory.class.getResourceAsStream("/applicationContext.properties");
+            env.load(inputStream);
+            inputStream.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    // 通用工厂方法，根据 key 获取对应对象实例
+    public static Object getBean(String key) {
+        Object ret = null;
+        try {
+            Class<?> clazz = Class.forName(env.getProperty(key));
+            ret = clazz.newInstance();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return ret;
+    }
+}
+
+```
+
+- 通用工厂的使用方式
+
+  ```java
+  1. 定义类型 (类)
+  2. 通过配置⽂件的配置告知⼯⼚(applicationContext.properties)
+     key = value
+  3. 通过⼯⼚获得类的对象
+     Object ret = BeanFactory.getBean("key")
+  ```
+
+## 4.Spring本质
+
+⼯⼚：ApplicationContext 
+
+配置文件：applicationContext.xml 
+
+# 第一个Spring程序
+
+## 1.配置文件
+
+-  配置⽂件的放置位置：任意位置 没有硬性要求
+-  配置⽂件的命名：没有硬性要求  建议：applicationContext.xml
+
+## 2.核心API
+
+- ApplicationContext
+
+  作用：Spring提供ApplicationContext作为⼯⼚，⽤于对象的创建
+
+  好处：解耦合
+
+  - ApplicationContext接⼝类型
+
+    ```
+    1.接⼝：屏蔽实现的差异
+    2.⾮web环境 ： ClassPathXmlApplicationContext (main junit)
+    3.web环境  ：  XmlWebApplicationContext
+    ```
+    
+    ![](https://wsb-typora-picture.oss-cn-chengdu.aliyuncs.com/picgo/202504061841645.png)
+    
+  - 重量级资源
+  
+    ```
+    ApplicationContext⼯⼚的对象占⽤⼤量内存。
+    所以，不会频繁的创建对象 ： ⼀个应⽤只会创建⼀个⼯⼚对象。
+    所以，ApplicationContext⼯⼚：⼀定是线程安全的(多线程并发访问)
+    ```
+
+## 3.程序
+
+```java
+// 1. 创建类型
+
+// 2. 配置文件的配置 applicationContext.xml
+// <bean id="person" class="com.baizhiedu.basic.Person"/>
+
+// 3. 通过工厂类，获得对象
+// ApplicationContext
+//     |- ClassPathXmlApplicationContext
+ApplicationContext ctx = new ClassPathXmlApplicationContext("/applicationContext.xml");
+Person person = (Person) ctx.getBean("person");
+```
+
+
+
+
+
+
+
 # IOC
 
 ## bean的基础配置(id,class)
