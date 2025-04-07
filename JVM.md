@@ -383,3 +383,128 @@ println方法内部使用了synchronized关键字，要对当前this，即PrintS
 **4.**线程2 执行 ready = true，切换到线程1，进入 if 分支，相加为 0，再切回线程2 执行  num = 2。
 
 上述第4种现象叫做**指令重排**，是 JIT 编译器在运行时的一些优化。
+
+### 3.2解决方法
+
+加上volatile关键字可以禁用指令重排。
+
+```java
+volatile boolean ready = false;
+```
+
+### 3.3有序性理解
+
+JVM 会在不影响正确性的前提下，调整语句的执行顺序
+
+```java
+static int i;
+static int j;
+ // 在某个线程内执行如下赋值操作
+i = ...; // 较为耗时的操作
+j = ...; 
+```
+
+可以看到，先执行 i  还是 先执行  j ，对最终的结果不会产生影响。所以，上面代码真正执行时，既可以是
+
+```java
+i = ...; // 较为耗时的操作
+j = ...;
+```
+
+也可以是
+
+```java
+j = ...;
+i = ...; // 较为耗时的操作
+```
+
+这种特性称之为『指令重排』。在单线程情况下没有问题，但在多线程情况下就会出现问题。
+
+例如：著名的 double-checked  locking（双重判定锁） 模式实现单例
+
+```java
+public final class Singleton {
+    private static Singleton INSTANCE = null;
+
+    private Singleton() { }
+
+    public static Singleton getInstance() {
+        // 实例没创建，才会进入内部的 synchronized 代码块
+        if (INSTANCE == null) {            
+            synchronized (Singleton.class) {
+                // 也许有其它线程已经创建实例，所以再判断一次
+                if (INSTANCE == null) {
+                    INSTANCE = new Singleton();
+                }
+            }
+        }
+        return INSTANCE;
+    }
+}
+```
+
+以上的实现特点是： 
+
+1.懒惰实例化 
+
+2.首次使用创建实例时调用getInstance()才使用synchronized加锁，后续再创建实例时无需加锁（如果直接给getInstance方法上加锁，粒度就太大了，每次调用方法都会加锁）
+
+但在多线程环境下，上面的代码是有问题的，他没有考虑指令重排的问题。
+
+`INSTANCE = new Singleton() `对应的字节码为：
+
+```
+0:   new           #2      // class cn/itcast/jvm/t4/Singleton （创建 Singleton 对象：先给对象分配空间，执行结果																	会把对象的引用放入操作数栈）
+3:   dup                   // （操作数栈把这个引用复制了一份，此时，栈顶有两个对象的引用）
+4:   invokespecial #3      // Method "<init>":()V （第一个对象引用地址交给invokespecial调用构造方法<init>）
+7:   putstatic     #4      // Field （第二个对象引用地址交给putstatic给INSTANCE静态变量赋值）
+```
+
+其中 4 7 两步的顺序不是固定的，也许 jvm 会指令重排优化为：先将引用地址赋值给 INSTANCE 变量后，再执行 构造方法，如果两个线程 t1，t2 按如下时间序列执行：
+
+```
+时间1  t1 线程执行到 INSTANCE = new Singleton(); 
+时间2  t1 线程分配空间，为Singleton对象生成了引用地址（0 处）
+时间3  t1 线程将引用地址赋值给 INSTANCE，这时 INSTANCE != null（7 处）
+时间4  t2 线程进入getInstance() 方法，发现 INSTANCE != null（synchronized块外），直接返回 INSTANCE
+时间5  t1 线程执行Singleton的构造方法（4 处）
+```
+
+这时 t1 还未完全将构造方法执行完毕，如果在构造方法中要执行很多初始化操作，那么 t2 拿到的是将 是一个未初始化完毕的单例
+
+对 INSTANCE 使用 volatile 修饰即可，可以禁用指令重排，（在 JDK 5 以上的版本的 volatile 才 会真正有效）
+
+### 3.4happens-before
+
+happens-before 规定了哪些写操作对其它线程的读操作可见，它是可见性与有序性的一套规则总结， 抛开以下 happens-before 规则，JMM 并不能保证一个线程对共享变量的写，对于其它线程对该共享变 量的读可见
+
+## 4.CAS与原子类
+
+CAS 即  Compare and Swap，它体现的一种乐观锁的思想。配合volatile使用，不同于synchronized，它不会加锁。
+
+比如多个线程要对一个共享的整型变量执行 +1 操作：
+
+```java
+// 需要不断尝试
+while (true) { 
+    int 旧值 = 共享变量;  // 比如拿到了当前值 0。 （将共享变量从主内存中读到工作内存中）
+    int 结果 = 旧值 + 1;   // 在旧值 0 的基础上增加 1，正确结果是 1 
+
+    /*
+     * compareAndSwap(旧值, 结果) 会尝试把结果赋值给共享变量，赋值的同时会比较旧值和当前的旧值是否相同
+     * 这时候如果别的线程把共享变量改成了 5，本线程的正确结果 1 就作废了，
+     * 这时候 compareAndSwap 返回 false，重新尝试，直到：
+     * compareAndSwap 返回 true，表示我本线程做修改的同时，别的线程没有干扰
+     */
+    if (compareAndSwap(旧值, 结果)) { 
+        // 成功，退出循环
+        break;
+    }
+}
+```
+
+获取共享变量时，为了保证该变量的可见性，需要使用 volatile 修饰。结合 CAS 和 volatile 可以实现无 锁并发，适用于竞争不激烈、多核 CPU 的场景下。
+
+- 因为没有使用 synchronized，所以线程不会陷入阻塞，这是效率提升的因素之一 
+
+- 但如果竞争激烈，可以想到重试必然频繁发生，反而效率会受影响
