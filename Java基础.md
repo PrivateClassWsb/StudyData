@@ -618,31 +618,19 @@ StringBuilder是字符串的缓冲区, 我们可以将其理解为是一种容�
 
 # 集合
 
-集合是一种容器，用来装数据的，类似于数组。但数组定义完成并启动后，长度就固定了。集合大小可变，开发中用的更多。
 
-## ArrayList长度可变原理
 
-1.如果只是创建了ArrayList集合容器，没有进行添加操作时，底层数组长度默认为0，当添加第一个元素时，底层会创建一个新的长度为10的数组
+## 
 
-![image-20241023160428994](https://wsb-typora-picture.oss-cn-chengdu.aliyuncs.com/picgo/TyporaPic/image-20241023160428994.png)
-
-2.当容量用完时，扩容原数组 1.5 倍大小的新数组
-
-3.将原数组数据，拷贝到新数组中
-
-4.将新元素添加到新数组
-
-## ArrayList 集合常用成员方法
-
-| 方法名                               | 说明                                   |
-| ------------------------------------ | -------------------------------------- |
-| public boolean add(E e)              | 将指定的元素添加到此集合的末尾         |
-| public void add(int index,E element) | 在此集合中的指定位置插入指定的元素     |
-| public E get(int  index)             | 返回指定索引处的元素                   |
-| public int  size()                   | 返回集合中的元素的个数                 |
-| public E remove(int  index)          | 删除指定索引处的元素，返回被删除的元素 |
-| public boolean remove(Object o)      | 删除指定的元素，返回删除是否成功       |
-| public E set(int index,E element)    | 修改指定索引处的元素，返回被修改的元素 |
+|      |      |
+| ---- | ---- |
+|      |      |
+|      |      |
+|      |      |
+|      |      |
+|      |      |
+|      |      |
+|      |      |
 
 # Static
 
@@ -2370,6 +2358,8 @@ class InterBImpl<E> implements Inter<E>{
 
 # 集合
 
+集合是一种容器，用来装数据的，类似于数组。但数组定义完成并启动后，长度就固定了。集合大小可变，开发中用的更多。
+
 **单列集合：**
 
 List接口：ArrayList、LinkedList。存取有序、有索引、可以存储重复的
@@ -2400,7 +2390,7 @@ TreeMap、HashMap、LinkedHashMap
 所有的双列集合都实现了Map接口
 ```
 
-## Collection使用
+## Collection
 
 ![image-20241114142632386](https://wsb-typora-picture.oss-cn-chengdu.aliyuncs.com/picgo/202411141426648.png)
 
@@ -2418,7 +2408,7 @@ Collection<Student> c = new ArrayList<>();
 		//否则，它就是在拿地址值比较，就是删除失败或判断不包含该元素
 ```
 
-## 集合的通用遍历方式
+## 集合通用遍历方式
 
 ```java
 ArrayList<String> list = new ArrayList<>();
@@ -2428,7 +2418,7 @@ for (int i = 0; i < list.size(); i++) {
 // 这种遍历方式只适合有索引的集合。而List接口下的集合有索引，Set接口下的集合没有索引。
 ```
 
-### 三种方式：
+**三种方式：**
 
 迭代器、增强for循环、foreach方法
 
@@ -2479,7 +2469,7 @@ for (int i = 0; i < list.size(); i++) {
 }
 ```
 
-## List接口
+## List
 
 List因为支持索引，所以多了很多索引操作的独特api
 
@@ -2558,7 +2548,33 @@ List集合的遍历方式 :
         }
 ```
 
-## LinkedList类
+### ArrayList
+
+- **长度可变原理**
+
+1.如果只是创建了ArrayList集合容器，没有进行添加操作时，底层数组长度默认为0，当添加第一个元素时，底层会创建一个新的长度为10的数组
+
+![image-20241023160428994](https://wsb-typora-picture.oss-cn-chengdu.aliyuncs.com/picgo/TyporaPic/image-20241023160428994.png)
+
+2.当容量用完时，扩容原数组 1.5 倍大小的新数组
+
+3.将原数组数据，拷贝到新数组中
+
+4.将新元素添加到新数组
+
+- **常用成员方法**
+
+| 方法名                               | 说明                                   |
+| ------------------------------------ | -------------------------------------- |
+| public boolean add(E e)              | 将指定的元素添加到此集合的末尾         |
+| public void add(int index,E element) | 在此集合中的指定位置插入指定的元素     |
+| public E get(int  index)             | 返回指定索引处的元素                   |
+| public int  size()                   | 返回集合中的元素的个数                 |
+| public E remove(int  index)          | 删除指定索引处的元素，返回被删除的元素 |
+| public boolean remove(Object o)      | 删除指定的元素，返回删除是否成功       |
+| public E set(int index,E element)    | 修改指定索引处的元素，返回被修改的元素 |
+
+### LinkedList
 
 LinkedList 底层基于**双链表**实现的，查询元素慢，增删首尾元素是非常快的
 
@@ -2572,7 +2588,9 @@ LinkedList 底层基于**双链表**实现的，查询元素慢，增删首尾�
 
 即，如果离头部近，那就从头开始遍历。如果离尾部近，那就从尾部向前遍历。
 
-## TreeSet
+## Set
+
+### TreeSet
 
 作用 : 对集合中的元素进行排序操作 **(底层红黑树实现)**
 
@@ -2580,7 +2598,7 @@ LinkedList 底层基于**双链表**实现的，查询元素慢，增删首尾�
 
 两种排序方式：自然排序，比较器排序
 
-### 自然排序
+**自然排序**
 
 需要实现Comparable<T>接口，此接口强行对实现它的每个类的对象进行整体排序。
 
@@ -2635,7 +2653,7 @@ public class Student implements Comparable<Student>{
 // 字符串也可以进行比较，因为String这个类也实现了Comparable接口，也有compareTo方法。
 ```
 
-### 比较器排序
+**比较器排序**
 
 ```java
     /*
@@ -2672,7 +2690,7 @@ Java已经写好类, 大多数都具有自然排序的规则, 这些规则放在
 
  这时候就要使用比较器排序.
 
-## HashSet
+### HashSet
 
 底层采用**哈希表**存储数据
 
@@ -2745,7 +2763,7 @@ B:链表挂载的元素超过了8 (阈值) 个 , 并且数组长度没有超过6
 
 链表挂载的元素超过了8 (阈值) 个, 并且数组长度到达了64 。
 
-## LinkedHashSet
+### LinkedHashSet
 
 特点：有序（保证存取顺序）、不重复、无索引。
 
@@ -2753,13 +2771,13 @@ B:链表挂载的元素超过了8 (阈值) 个 , 并且数组长度没有超过6
 
 ![image-20241122144155762](https://wsb-typora-picture.oss-cn-chengdu.aliyuncs.com/picgo/202411221441055.png)
 
-## Collections集合工具类
+## Collections
 
 java.utils.Collections:集合工具类
 
 Collections并不属于集合，是用来操作集合的工具类。
 
-**可变参数**：
+### 可变参数
 
 可变参数用在形参中可以接收多个数据。
 
@@ -2803,7 +2821,7 @@ Collections并不属于集合，是用来操作集合的工具类。
 | ------------------------------------------------------------ | ---------------------------- |
 | public static <T> void sort(List<T>  list，Comparator<? super T> c) | 将集合中元素按照指定规则排序 |
 
-## Map接口
+## Map
 
 Map 集合是一种双列集合，每个元素包含两个数据
 
@@ -2839,7 +2857,7 @@ Map是双列集合的顶层接口，它的功能是全部双列集合都可以�
             LinkedHashMap : 哈希表+双向链。键唯一, 且可以保证存取顺序
 ```
 
-## Map集合的三种遍历方式：
+### Map集合的三种遍历方式
 
 1.通过键找值
 
@@ -2894,7 +2912,7 @@ Map是双列集合的顶层接口，它的功能是全部双列集合都可以�
 
 ```java
     /*
-        获取Stream流对象演示
+        获取Stream流对象：
             - 将数据放在流水线的传送带上
 
             1. 集合获取 Stream 流对象 (使用Collection接口中的默认方法)
