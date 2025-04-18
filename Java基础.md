@@ -3217,7 +3217,7 @@ Set<Integer> list2 = Stream.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10).filter(s -
         fos.close();
 ```
 
-### 标准关流流程
+**标准关流流程**
 
 JDK7版本之前：
 
@@ -3253,7 +3253,8 @@ JDK7版本之后：
     /*
         IO流的异常处理方式: jdk7版本开始
      */
-		//实现AutoCloseable接口的类的对象会自动调用close方法
+		// try()中的对象需要实现过AutoCloseable接口
+		// 实现AutoCloseable接口的类的对象会自动调用close方法
         try(FileOutputStream fos = new FileOutputStream("D:\\B.txt");) { 
             fos.write("abc".getBytes());
         } catch (IOException e) {
@@ -3310,25 +3311,6 @@ String类中的一个构造方法：
 注意: 缓冲流不具备读写功能, 它们只是对普通的流对象进行包装。真正和文件建立关联的, 还是普通的流对象
 
 ![image-20241127101847572](https://wsb-typora-picture.oss-cn-chengdu.aliyuncs.com/picgo/202411271018833.png)
-
-![image-20241127102216463](https://wsb-typora-picture.oss-cn-chengdu.aliyuncs.com/picgo/202411271022707.png
-
-```java
-        // 1. 创建字节缓冲输入流
-        BufferedInputStream bis = new BufferedInputStream(new FileInputStream("D:\\猪猪侠.ogg"));
-        // 2. 创建字节缓冲输出流
-        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream("E:\\猪猪侠.ogg"));
-
-        // 3. 读写操作
-        int i;
-        while ((i = bis.read()) != -1) {
-            bos.write(i);
-        }
-
-        // 4. 关流
-        bis.close();
-        bos.close();
-```
 
 ![image-20241127104558451](https://wsb-typora-picture.oss-cn-chengdu.aliyuncs.com/picgo/202411271045573.png)
 
