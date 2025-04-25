@@ -195,6 +195,34 @@ ApplicationContext ctx = new ClassPathXmlApplicationContext("/applicationContext
 Person person = (Person) ctx.getBean("person");
 ```
 
+# 反转控制（IOC）
+
+- 控制：对于成员变量赋值的控制权 
+
+- 反转控制：把对于成员变量赋值的控制权，从代码中反转(转移)到Spring⼯⼚和配置⽂件中完成   
+
+- 好处：解耦合 
+
+- 底层实现：工厂设计模式
+
+  ![image-20250425124125414](https://wsb-typora-picture.oss-cn-chengdu.aliyuncs.com/picgo/202504251241707.png)
+
+# 依赖注入（DI）
+
+- 注⼊：通过Spring的工厂及配置文件，为对象（bean，组件）的成员变量赋值 
+
+- 依赖注⼊：当⼀个类需要另⼀个类时，就意味着依赖，⼀旦出现依赖，就可以把另⼀个类作为本类的成员变量，最终通过Spring配置⽂件进行注入(赋值)。   
+
+- 好处：解耦合
+
+![image-20250425124200864](https://wsb-typora-picture.oss-cn-chengdu.aliyuncs.com/picgo/202504251242989.png)
+
+
+
+
+
+
+
 
 
 

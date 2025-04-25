@@ -4638,7 +4638,7 @@ class Single2 {
     }
 ```
 
-# 日志框架logback
+# 日志框架
 
 ## JUL
 
@@ -4650,7 +4650,7 @@ JavaSE平台提供的官方日志框架（java.util.logging）。配置相对简
 
 ## Logback
 
-基于Log4j升级而来，提供了更多的功能和配置选项，性能由于Log4j
+基于Log4j升级而来，提供了更多的功能和配置选项，性能优于Log4j
 
 ## Slf4j
 
@@ -4658,11 +4658,81 @@ Log4j和Logback是他的实现类。
 
 简单的日志门面，提供了一套日志操作的标准接口及抽象类，允许应用程序使用不同的底层日志框架
 
+# 枚举
 
+- 格式：
 
+```java
+修饰符 enum 枚举类名{
+    枚举类1，枚举类2，枚举类3...
+}
+enum Season{
+    SPRING, SUMMER, AUTUMN, WINTER;
+}
+```
 
+- 特点
+  - 每一个枚举项其实就是该枚举的一个对象
+  - 通过枚举类名去访问指定的枚举项 
+  - 所有枚举类都是 Enum 的子类
+  - 枚举也是类, 可以定义成员变量
+  - 枚举类的第一行上必须是枚举项，最后一个枚举项后的分号是可以省略的。但是如果枚举类有其他的东西，这个分号就不能省略 (建议不要省略)
+  - 枚举类可以有构造器，但必须是 private 的，它默认也是 private 
+  - 枚举类也可以有抽象方法，但是枚举项必须重写该方法
 
+```java
+enum Season{
+    SPRING("春天"){
+    	@Overrided
+        public void show(){
+            ...
+        }
+    },
+    SUMMER("夏天"), 
+    AUTUMN("秋天"), 
+    WINTER("冬天");
+    String name;
+    private Season(String name){
+        this.name = name;
+    }
+    public abstract void show();
+}
+```
 
+# 类加载器
+
+将类的字节码文件加载到方法区
+
+- 类加载器的加载过程
+
+  ![image-20250422143124319](https://wsb-typora-picture.oss-cn-chengdu.aliyuncs.com/picgo/202504221431680.png)
+
+- 类加载器的分类
+
+  ![image-20250422143655030](https://wsb-typora-picture.oss-cn-chengdu.aliyuncs.com/picgo/202504221436143.png)
+
+```java
+public Classloader getClassLoader() //获取该类的, 类加载器对象.   .class字节码对象调用
+```
+
+- 双亲委派模式
+
+  如果一个类加载器收到了类加载的请求，它并不会自己先加载，而是先把这个请求委托给它的父类加载器去执行，如果这个父类加载器还存在其他父类加载器，则进一步向上委托，依次递归，请求最终会到达顶层的启动类加载器，如果父类加载器可以完成类加载任务，就成功返回。如果父类加载器无法完成此加载任务，子加载器才会尝试自己去加载，这就是双亲委派模式。可以避免类的重复加载。
+
+  ![image-20250422145031331](https://wsb-typora-picture.oss-cn-chengdu.aliyuncs.com/picgo/202504221450505.png)
+
+- ClassLoader的常用方法
+
+  ```java
+  public static ClassLoader getSystemClassLoader() // 获取系统类加载器
+  public InputStream getResourceAsStream(String name) // 加载某一个资源文件
+  ```
+
+  ```java
+  ClassLoader systemClassLoader = ClassLoader.getSystemClassLoader();
+  InputStream is = systemClassLoader.getResourceAsStream(config.properties);
+  // 系统类加载器是用来加载我们自己写的类，而我们自己写的类在src下，所以他就会直接在src下找，所以我们需要把文件放到src下面，同时不需要写绝对或相对路径，而只用写文件名即可。
+  ```
 
 # 反射
 
@@ -4888,9 +4958,9 @@ Class cClass = student.getClass();
 
 **获取成员方法并运行：**
 
-.invoke
-
-
+| **方法**                                   | **功能** |
+| ------------------------------------------ | -------- |
+| Object  invoke(Object obj, Object... args) | 运行方法 |
 
 # 代理
 
