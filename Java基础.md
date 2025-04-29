@@ -616,22 +616,6 @@ StringBuilder是字符串的缓冲区, 我们可以将其理解为是一种容�
 > | public int  length()                   | 返回长度 ( 字符出现的个数)                          |
 > | public String toString()               | 通过toString()就可以实现把StringBuilder转换为String |
 
-# 集合
-
-
-
-## 
-
-|      |      |
-| ---- | ---- |
-|      |      |
-|      |      |
-|      |      |
-|      |      |
-|      |      |
-|      |      |
-|      |      |
-
 # Static
 
 可以修饰成员变量，也可以修饰成员方法
@@ -1074,7 +1058,7 @@ public class demo1 {
 
 3.该类可以直接访问外部类的成员,也可以访问方法内的局部变量
 
-## 匿名内部类(***):
+## 匿名内部类:
 
 ```java
 new 类名或者接口名() {
@@ -4063,7 +4047,7 @@ class Printer1 {
     /*
         三条线程通信
 
-        问题:     方法和wait方法的区别?
+        问题:   sleep方法和wait方法的区别?
         回答:
                 sleep方法是线程休眠, 时间到了自动醒来, sleep方法在休眠的时候, 不会释放锁.
                 wait方法是线程等待, 需要由其它线程进行notify唤醒, wait方法在等待期间, 会释放锁.
@@ -4468,12 +4452,12 @@ ThreadPoolExecutor 类
 
 **拒绝策略**
 
-| 策略选项                               | 说明                                                |
-| -------------------------------------- | --------------------------------------------------- |
-| ThreadPoolExecutor.AbortPolicy         | 丢弃任务并抛出RejectedExecutionException异常 (默认) |
-| ThreadPoolExecutor.DiscardPolicy       | 丢弃任务，但是不抛出异常 这是不推荐的做法           |
-| ThreadPoolExecutor.DiscardOldestPolicy | 抛弃队列中等待最久的任务 然后把当前任务加入队列中   |
-| ThreadPoolExecutor.CallerRunsPolicy    | 调用任务的run()方法, 绕过线程池直接执行             |
+| 策略选项                               | 说明                                                         |
+| -------------------------------------- | ------------------------------------------------------------ |
+| ThreadPoolExecutor.AbortPolicy         | 丢弃最新提交的任务并抛出RejectedExecutionException异常 (默认) |
+| ThreadPoolExecutor.DiscardPolicy       | 丢弃任务，但是不抛出异常 这是不推荐的做法                    |
+| ThreadPoolExecutor.DiscardOldestPolicy | 抛弃队列中等待最久的任务 然后把当前任务加入队列中            |
+| ThreadPoolExecutor.CallerRunsPolicy    | 调用任务的run()方法, 绕过线程池直接执行                      |
 
 ```java
     /*
