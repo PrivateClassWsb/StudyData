@@ -119,7 +119,7 @@
 
 <img src="https://wsb-typora-picture.oss-cn-chengdu.aliyuncs.com/picgo/202504301644061.png" alt="image-20250430164406033" style="zoom:50%;" />
 
-将内存分成两块，每次申请内存时都使用其中的一块，当内存不够时，将这一块内存中所有存活的复制到另一块上。然后再把已使用的内存整个清理掉。解决了空间碎片的问题。
+将内存分成两块，每次申请内存时都使用其中的一块，当内存不够时，将这一块内存中所有存活的复制到另一块上。然后再把已使用的内存整个清理掉。然后交换两个区域的位置。解决了空间碎片的问题。
 
 **弊端：**
 
@@ -130,7 +130,65 @@
 
 ![image-20250430164424442](https://wsb-typora-picture.oss-cn-chengdu.aliyuncs.com/picgo/202504301644563.png)
 
-将内存划分成了新生代和老年代。对象创建时，一般在新生代申请内存，当经历一次 GC 之后如果对还存活，那么对象创建时，一般在新生代申请内存，当经历一次 GC 之后如果对还存活，那么对象对象还存活，那么该对象会进入老年代。
+将堆内存划分成了新生代和老年代两个区域。新生代中又划分为伊甸园、幸存区From和幸存区To。
+
+当创建新对象时，一般在伊甸园中。当伊甸园空间不够时，将触发一次垃圾回收，在新生代中的垃圾回收叫 Minor GC。然后根据可达性分析进行标记。然后采用复制算法将存活的对象复制到幸存区To中，同时将这些幸存的对象的寿命+1。然后交换幸存区From和幸存区To的位置。
+
+<img src="https://wsb-typora-picture.oss-cn-chengdu.aliyuncs.com/picgo/202505071414564.png" alt="image-20250507141420512" style="zoom:50%;" />
+
+当下一次Minor GC时，除了伊甸园外，要同时分析幸存区中是否有垃圾要被回收。
+
+当幸存区中对象超过阈值（默认15次垃圾回收后还存活），就将其放入老年代中。
+
+当老年代空间不足，会先尝试触发Minor GC，如果之后空间仍不足，那么触发Full GC，STW的时间更长。
+
+> Minor GC会引发Stop The World。
+>
+> 即当发生垃圾回收时，要暂停其他的用户线程，由垃圾回收线程完成垃圾回收流程。
+
+# 垃圾回收器
+
+## 1.串行垃圾回收器
+
+![image-20250507143232483](https://wsb-typora-picture.oss-cn-chengdu.aliyuncs.com/picgo/202505071432680.png)
+
+串行垃圾回收器分为Serial和SerialOld。
+
+Serial工作在新生代，采用复制回收算法。
+
+SerialOld工作在老年代，采用标记整理算法。
+
+## 2.吞吐量优先垃圾回收器
+
+<img src="https://wsb-typora-picture.oss-cn-chengdu.aliyuncs.com/picgo/202505071438796.png" alt="image-20250507143830710" style="zoom:50%;" />
+
+ParallelGC工作在新生代，采用复制回收算法。
+
+ParallelOldGC工作在老年代，采用标记整理算法。
+
+![image-20250507144019119](https://wsb-typora-picture.oss-cn-chengdu.aliyuncs.com/picgo/202505071440162.png)
+
+## 3.响应时间优先垃圾回收器
+
+<img src="https://wsb-typora-picture.oss-cn-chengdu.aliyuncs.com/picgo/202505071446326.png" alt="image-20250507144656304" style="zoom:50%;" />
+
+CMS(Concurrent Mark Sweep)并发标记清除。工作在新生代。
+
+ParNewGC工作在新生代，采用复制回收算法。
+
+> 并发：当垃圾回收线程工作时，其他的用户线程可以同时进行。即它们是并发执行，他们都要去抢占CPU。
+>
+> 并行：当多个垃圾回收线程并行工作，不允许用户线程工作，即STW。
+
+当用CMS发生并发失败问题时，让老年代垃圾回收器从CMS退化为SerialOld。
+
+初始标记和重新标记阶段会触发STW。
+
+![image-20250507145619092](https://wsb-typora-picture.oss-cn-chengdu.aliyuncs.com/picgo/202505071456271.png)
+
+
+
+
 
 
 
