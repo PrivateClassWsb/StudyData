@@ -217,11 +217,11 @@ Person person = (Person) ctx.getBean("person");
 
 ![image-20250425124200864](https://wsb-typora-picture.oss-cn-chengdu.aliyuncs.com/picgo/202504251242989.png)
 
+# Spring工厂创建复杂对象
 
+![image-20250428125418157](https://wsb-typora-picture.oss-cn-chengdu.aliyuncs.com/picgo/202504281254342.png)
 
-
-
-
+1什么是复杂对象
 
 
 
