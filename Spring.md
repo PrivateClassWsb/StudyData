@@ -229,6 +229,10 @@ Person person = (Person) ctx.getBean("person");
 
 
 
+
+
+
+
 # IOC
 
 ## bean的基础配置(id,class)
