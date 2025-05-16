@@ -172,7 +172,7 @@ ParallelOldGC工作在老年代，采用标记整理算法。
 
 <img src="https://wsb-typora-picture.oss-cn-chengdu.aliyuncs.com/picgo/202505071446326.png" alt="image-20250507144656304" style="zoom:50%;" />
 
-CMS(Concurrent Mark Sweep)并发标记清除。工作在新生代。
+CMS(Concurrent Mark Sweep)并发标记清除。工作在老年代。
 
 ParNewGC工作在新生代，采用复制回收算法。
 

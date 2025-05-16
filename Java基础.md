@@ -4512,11 +4512,12 @@ ThreadPoolExecutor 类
         单例设计模式 - 饿汉式
 
         -----------------------------------------------------------------
-
+		
         class Single1 {
             private Single1() {
             }
-
+			// static保证可以通过类名.s的形式拿到同一个s。final保证拿到s后无法修改s。
+			// 比如： Single1 s = Single1.s;
             public static final Single1 s = new Single1();
         }
 
@@ -4526,11 +4527,12 @@ ThreadPoolExecutor 类
         Single1 s = Single1.getInstance();
     }
 }
-
+// 改为面向对象版本：
 class Single1 {
+    // private保证别人不能随便用构造方法new出很多Single1
     private Single1() {
     }
-
+	// static保证getInstance这个静态方法可以返回静态变量s
     private static Single1 s = new Single1();
 
     public static Single1 getInstance() {
@@ -4553,7 +4555,7 @@ class Single1 {
                 private static Single2 s;
 
                 public static Single2 getInstance() {
-                    if (s == null) {
+                    if (s == null) { // 为了保证单例，不然调用两次getInstance就会new出来两个不同的对象
                         s = new Single2();
                     }
                     return s;
