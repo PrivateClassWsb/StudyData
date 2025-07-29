@@ -393,7 +393,8 @@ int array[][] =  {{11,22},{33,44}} // 这种也可以，但根据阿里巴巴编
 // 动态初始化
 int[][] array =  new int[2][3]
 int[][] array = new int[2][];
-int[][] array = new int[][3]; // 错误
+int[][] array = new int[][3]; // 错误 必须要指定一维长度
+int[][] arrayName = {1}; // 错误，必须是嵌套的形式，int[][] arrayName = {{1}};正确
 ```
 
 # 构造方法
@@ -4607,11 +4608,11 @@ class Single2 {
     private Single2() {
     }
 
-    private static Single2 s;
+    private static volatile Single2 s;
 
     public static Single2 getInstance() {
         // 线程2
-        // 线程1
+        // 线程1	
         if (s == null) {
             synchronized (Single2.class) {
                 if (s == null) {
